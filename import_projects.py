@@ -1,5 +1,5 @@
-
 import csv
+import time
 import gitlab
 import requests
 import os
@@ -12,21 +12,18 @@ parser.add_argument('--token', required=True, help='Private token for GitLab API
 parser.add_argument('--csv', required=True, help='Path to the CSV file.')
 args = parser.parse_args()
 
-# Setting up the Proxy 
+# Proxy Settings
 # os.environ['http_proxy'] = "http://PROXY_HOST:PROXY_PORT"  
 # os.environ['https_proxy'] = "https://PROXY_HOST:PROXY_PORT"
 
-# Setting the GitLab host and private token to create an API client
-gl = gitlab.Gitlab('https://gitlab.com', private_token=args.token)
-
-# Setting up logging
+# Logging Settings
 logging.basicConfig(filename='import_result.log', level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
 
 # Opening the CSV file and reading each row
 with open(args.csv, 'r') as f:
     reader = csv.reader(f)
     for row in reader:
-        file_path, namespace, path = row  # Reading data from each row of the CSV
+        file_path, namespace, path = row  # CSV の各行からデータ読み取り
 
         # Loading the export file
         with open(file_path, 'rb') as f:
@@ -48,3 +45,5 @@ with open(args.csv, 'r') as f:
             log_message = f' INFO  - File Path: {file_path}, Status Code: {response.status_code}, Created'
             print(log_message)
             logging.info(log_message)
+        # Wait 12 seconds to avoid API call limit
+        time.sleep(12)
