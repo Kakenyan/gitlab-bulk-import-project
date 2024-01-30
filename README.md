@@ -1,58 +1,67 @@
-# GitLab Project CSV Importer
+# GitLab Project Importer
 
-GitLab Project Importer is a Python script for importing GitLab projects from a CSV file.
+This Python script allows you to import GitLab projects from a CSV file using the GitLab API.
 
-### Features
+## Requirements
 
-- Import project information from CSV file
-- Import projects using GitLab API
-- Log output of import results
+- Python 3.x
+- `requests` library
+- `csv` library
+- GitLab private token
 
-### Requirements
+## Usage
 
-- Python 3.6 or higher
-- Required Python libraries: csv, gitlab, requests, logging, argparse, os, datetime 
-
-### Installation
-
-GitLab Project Importer does not require special installation. Simply clone the repository and use it directly.
-
-```bash
-git clone https://github.com/kakenyan/gitlab-project-csv-importer.git
-cd gitlab-project-importer
-```
-
-Before running the script, you need to install some dependencies. You can use the following pip command:
-
-```bash
-pip3 install python-gitlab requests
-```
-
-### Usage
-
-The script is operated from the command line. It requires a private token for GitLab API and path to a CSV file with information about the projects to be imported.
-
-```bash
-python import_projects.py --token your_token --csv path_to_your_csv_file.csv
-```
-
-### CSV File Format
-
-The CSV file needs to contain the file_path, namespace, and path for each project. Please structure your data in the following format:
+1. Configure the parsing of command line arguments by providing a private token for GitLab API and the path to the CSV file:
 
 ```
-file_path,namespace,path
-/path/to/your/project.tar.gz,your_namespace,your_project_path
+parser.add_argument('--token', required=True, help='Private token for GitLab API.')
+parser.add_argument('--csv', required=True, help='Path to the CSV file.')
 ```
 
-### Log Output
+2. (Optional) Configure proxy settings if needed:
+```
+# Proxy Settings
+os.environ['http_proxy'] = "http://PROXY_HOST:PROXY_PORT"  
+os.environ['https_proxy'] = "https://PROXY_HOST:PROXY_PORT"
+```
 
-The result of the project import is logged and output in a file named 'import_result.log'. Each log entry is prefixed with a timestamp.
+3. Set up logging to record the import results:
+```
+# Logging Settings
+logging.basicConfig(filename='import_result.log', level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
+```
 
-### License
+4. Run the script by providing the required arguments:
 
-MIT License
+```
+python import_gitlab.py --token YOUR_PRIVATE_TOKEN --csv PATH_TO_CSV_FILE
+```
+
+## CSV File Format
+
+The CSV file should contain the following columns in each row:
+
+- File path of the project export file
+- Namespace for the project
+- Path for the project
+
+## Import Process
+
+The script does the following steps:
+
+1. Opens the CSV file and reads each row.
+2. Loads the project export file.
+3. Sends a request to the GitLab API endpoint to upload the export data.
+4. Checks the response and logs success or error messages.
+5. Waits 12 seconds between requests to avoid hitting API call limits.
+
+## Logging
+
+The script generates a `import_result.log` file to log the status of each import attempt, including success and error messages with timestamps.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
-
-Please feel free to provide feedback if you encounter any issues! Use it at your own risk.
+**Note**: This script is designed to work with GitLab API, ensure you have a valid token and correct CSV file format.
