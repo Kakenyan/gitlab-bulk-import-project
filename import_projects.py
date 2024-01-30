@@ -1,6 +1,5 @@
 import csv
 import time
-import gitlab
 import requests
 import os
 import logging
